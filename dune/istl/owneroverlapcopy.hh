@@ -298,6 +298,22 @@ namespace Dune {
       return cc;
     }
 
+    void clearInterfaces()
+    {
+      //ri.free();
+      if (OwnerToAllInterfaceBuilt) OwnerToAllInterface.free();
+      if (OwnerOverlapToAllInterfaceBuilt) OwnerOverlapToAllInterface.free();
+      if (OwnerCopyToAllInterfaceBuilt) OwnerCopyToAllInterface.free();
+      if (OwnerCopyToOwnerCopyInterfaceBuilt) OwnerCopyToOwnerCopyInterface.free();
+      if (CopyToAllInterfaceBuilt) CopyToAllInterface.free();
+      if (globalLookup_) this->freeGlobalLookup();
+      OwnerToAllInterfaceBuilt=false;
+      OwnerOverlapToAllInterfaceBuilt=false;
+      OwnerCopyToAllInterfaceBuilt=false;
+      OwnerCopyToOwnerCopyInterfaceBuilt=false;
+      CopyToAllInterfaceBuilt=false;
+      mask.resize(0);
+    }
     /**
      * @brief Communicate values from owner data points to all other data points.
      *
