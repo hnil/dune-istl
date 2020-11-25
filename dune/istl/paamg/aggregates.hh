@@ -111,9 +111,19 @@ namespace Dune
     template<class T>
     std::ostream& operator<<(std::ostream& os, const AggregationCriterion<T>& criterion)
     {
-      os<<"{ maxdistance="<<criterion.maxDistance()<<" minAggregateSize="
-      <<criterion.minAggregateSize()<< " maxAggregateSize="<<criterion.maxAggregateSize()
-      <<" connectivity="<<criterion.maxConnectivity()<<" debugLevel="<<criterion.debugLevel()<<"}";
+      os<<"{ maxdistance="<<criterion.maxDistance()
+        <<" minAggregateSize="<<criterion.minAggregateSize()
+        << " maxAggregateSize="<<criterion.maxAggregateSize()
+        <<" connectivity="<<criterion.maxConnectivity()<<" debugLevel="<<criterion.debugLevel()
+        <<" skipisolated= "<< criterion.skipIsolated()
+        <<" alpha = " << criterion.alpha()
+        <<" beta = " << criterion.beta()
+        <<" mincoarserate " << criterion.minCoarsenRate()
+        <<" maxlevel " << criterion.maxLevel()
+        <<" accumulate " << criterion.accumulate()
+        <<" dampingFacor " << criterion.getProlongationDampingFactor()
+        <<" coarsentarget " << criterion.coarsenTarget()
+        <<"}";
       return os;
     }
 

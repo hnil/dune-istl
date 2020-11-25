@@ -676,7 +676,7 @@ namespace Dune
       // the preconditioner yields slightly different results now.
 
       // Set the dirichlet border
-      //DirichletBoundarySetter<P>::template set<M>(coarse, pinfo, copy);
+      DirichletBoundarySetter<P>::template set<M>(coarse, pinfo, copy);
 
     }
 

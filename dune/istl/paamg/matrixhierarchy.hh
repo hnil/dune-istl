@@ -513,10 +513,13 @@ namespace Dune
         int noAggregates, isoAggregates, oneAggregates, skippedAggregates;
 
         std::tie(noAggregates, isoAggregates, oneAggregates, skippedAggregates) =
-          aggregatesMap->buildAggregates(matrix->getmat(), *(std::get<1>(graphs)), criterion, level==0);
+          aggregatesMap->buildAggregates(matrix->getmat(), *(std::get<1>(graphs)), criterion, true);//level==0 || level == 1);
 
-        if(rank==0 && criterion.debugLevel()>2)
-          std::cout<<" Have built "<<noAggregates<<" aggregates totally ("<<isoAggregates<<" isolated aggregates, "<<
+        if(criterion.debugLevel()>2)
+          if(rank == 0){
+            std::cout << criterion << std::endl;
+          }
+          std::cout<<" Have built on rank " << rank << " : " <<noAggregates<<" aggregates totally ("<<isoAggregates<<" isolated aggregates, "<<
           oneAggregates<<" aggregates of one vertex,  and skipped "<<
           skippedAggregates<<" aggregates)."<<std::endl;
 #ifdef TEST_AGGLO
@@ -622,6 +625,7 @@ namespace Dune
         GraphCreator::free(graphs);
 
         if(criterion.debugLevel()>2) {
+          std::cout << "rank " << rank << " aggregates used for coarse system " << aggregates << std::endl;
           if(rank==0)
             std::cout<<"Coarsening of index sets took "<<watch.elapsed()<<" seconds."<<std::endl;
         }
