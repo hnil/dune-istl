@@ -673,9 +673,16 @@ namespace Dune
         }
 
         BIGINT nonzeros = countNonZeros(*coarseMatrix);
+        BIGINT levelnonzeros =  infoLevel->communicator().sum(nonzeros);
         allnonzeros = allnonzeros + infoLevel->communicator().sum(nonzeros);
         MatrixArgs args(coarseMatrix, *infoLevel);
 
+        if(criterion.debugLevel()>2) {
+          std::cout << "Level  " << level << " rank " << rank << " nonzeros " << nonzeros.todouble() << std::endl;
+          if(rank==0){
+            std::cout << "Level " << level << " total nonzeros " << levelnonzeros.todouble() << std::endl;
+          }
+        }
         matrices_.addCoarser(args);
         redistributes_.push_back(RedistributeInfoType());
       } // end level loop
