@@ -512,6 +512,9 @@ namespace Dune {
       return umfpackMatrix_;
     }
 
+    const double* getDecompositionInfo() const{
+      return &UMF_Decomposition_Info_[0];
+    }
     /**
      * @brief free allocated space.
      * @warning later calling apply will result in an error.
@@ -539,7 +542,8 @@ namespace Dune {
     /** @brief computes the LU Decomposition */
     void decompose()
     {
-      double UMF_Decomposition_Info[UMFPACK_INFO];
+      //double UMF_Decomposition_Info[UMFPACK_INFO];
+      //UMF_Decomposition_Info_[UMFPACK_INFO];
       Caller::symbolic(static_cast<int>(umfpackMatrix_.N()),
                        static_cast<int>(umfpackMatrix_.N()),
                        umfpackMatrix_.getColStart(),
@@ -547,27 +551,27 @@ namespace Dune {
                        reinterpret_cast<double*>(umfpackMatrix_.getValues()),
                        &UMF_Symbolic,
                        UMF_Control,
-                       UMF_Decomposition_Info);
+                       UMF_Decomposition_Info_);
       Caller::numeric(umfpackMatrix_.getColStart(),
                       umfpackMatrix_.getRowIndex(),
                       reinterpret_cast<double*>(umfpackMatrix_.getValues()),
                       UMF_Symbolic,
                       &UMF_Numeric,
                       UMF_Control,
-                      UMF_Decomposition_Info);
-      Caller::report_status(UMF_Control,UMF_Decomposition_Info[UMFPACK_STATUS]);
+                      UMF_Decomposition_Info_);
+      Caller::report_status(UMF_Control,UMF_Decomposition_Info_[UMFPACK_STATUS]);
       if (verbosity_ == 1)
       {
         std::cout << "[UMFPack Decomposition]" << std::endl;
-        std::cout << "Wallclock Time taken: " << UMF_Decomposition_Info[UMFPACK_NUMERIC_WALLTIME] << " (CPU Time: " << UMF_Decomposition_Info[UMFPACK_NUMERIC_TIME] << ")" << std::endl;
-        std::cout << "Flops taken: " << UMF_Decomposition_Info[UMFPACK_FLOPS] << std::endl;
-        std::cout << "Peak Memory Usage: " << UMF_Decomposition_Info[UMFPACK_PEAK_MEMORY]*UMF_Decomposition_Info[UMFPACK_SIZE_OF_UNIT] << " bytes" << std::endl;
-        std::cout << "Condition number estimate: " << 1./UMF_Decomposition_Info[UMFPACK_RCOND] << std::endl;
-        std::cout << "Numbers of non-zeroes in decomposition: L: " << UMF_Decomposition_Info[UMFPACK_LNZ] << " U: " << UMF_Decomposition_Info[UMFPACK_UNZ] << std::endl;
+        std::cout << "Wallclock Time taken: " << UMF_Decomposition_Info_[UMFPACK_NUMERIC_WALLTIME] << " (CPU Time: " << UMF_Decomposition_Info_[UMFPACK_NUMERIC_TIME] << ")" << std::endl;
+        std::cout << "Flops taken: " << UMF_Decomposition_Info_[UMFPACK_FLOPS] << std::endl;
+        std::cout << "Peak Memory Usage: " << UMF_Decomposition_Info_[UMFPACK_PEAK_MEMORY]*UMF_Decomposition_Info_[UMFPACK_SIZE_OF_UNIT] << " bytes" << std::endl;
+        std::cout << "Condition number estimate: " << 1./UMF_Decomposition_Info_[UMFPACK_RCOND] << std::endl;
+        std::cout << "Numbers of non-zeroes in decomposition: L: " << UMF_Decomposition_Info_[UMFPACK_LNZ] << " U: " << UMF_Decomposition_Info_[UMFPACK_UNZ] << std::endl;
       }
       if (verbosity_ == 2)
       {
-        Caller::report_info(UMF_Control,UMF_Decomposition_Info);
+        Caller::report_info(UMF_Control,UMF_Decomposition_Info_);
       }
     }
 
@@ -590,6 +594,7 @@ namespace Dune {
     void *UMF_Symbolic;
     void *UMF_Numeric;
     double UMF_Control[UMFPACK_CONTROL];
+    double UMF_Decomposition_Info_[UMFPACK_INFO];
   };
 
   template<typename T, typename A, int n, int m>
