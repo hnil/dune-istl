@@ -12,6 +12,7 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <type_traits>
 #include <vector>
 #include <map>
 #include <memory>
@@ -1658,13 +1659,25 @@ namespace Dune {
       ConstRowIterator endi=end();
       for (ConstRowIterator i=this->begin(); i!=endi; ++i)
       {
-        y[i.index()]=0;
         ConstColIterator endj = (*i).end();
-        for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
-        {
-          auto&& xj = Impl::asVector(x[j.index()]);
-          auto&& yi = Impl::asVector(y[i.index()]);
-          Impl::asMatrix(*j).umv(xj, yi);
+        // Local row sum: without it the compiler stores y[i] after every block.
+        if constexpr (std::is_trivially_copyable_v<std::decay_t<decltype(y[i.index()])>>) {
+          auto acc = y[i.index()];
+          acc = 0;
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            Impl::asMatrix(*j).umv(xj, Impl::asVector(acc));
+          }
+          y[i.index()] = acc;
+        } else {
+          y[i.index()]=0;
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            auto&& yi = Impl::asVector(y[i.index()]);
+            Impl::asMatrix(*j).umv(xj, yi);
+          }
         }
       }
     }
@@ -1683,11 +1696,23 @@ namespace Dune {
       for (ConstRowIterator i=this->begin(); i!=endi; ++i)
       {
         ConstColIterator endj = (*i).end();
-        for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
-        {
-          auto&& xj = Impl::asVector(x[j.index()]);
-          auto&& yi = Impl::asVector(y[i.index()]);
-          Impl::asMatrix(*j).umv(xj,yi);
+        // Local row sum: without it the compiler stores y[i] after every block.
+        if constexpr (std::is_trivially_copyable_v<std::decay_t<decltype(y[i.index()])>>) {
+          auto acc = y[i.index()];
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            Impl::asMatrix(*j).umv(xj,Impl::asVector(acc));
+          }
+          y[i.index()] = acc;
+        } else {
+
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            auto&& yi = Impl::asVector(y[i.index()]);
+            Impl::asMatrix(*j).umv(xj,yi);
+          }
         }
       }
     }
@@ -1706,11 +1731,23 @@ namespace Dune {
       for (ConstRowIterator i=this->begin(); i!=endi; ++i)
       {
         ConstColIterator endj = (*i).end();
-        for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
-        {
-          auto&& xj = Impl::asVector(x[j.index()]);
-          auto&& yi = Impl::asVector(y[i.index()]);
-          Impl::asMatrix(*j).mmv(xj,yi);
+        // Local row sum: without it the compiler stores y[i] after every block.
+        if constexpr (std::is_trivially_copyable_v<std::decay_t<decltype(y[i.index()])>>) {
+          auto acc = y[i.index()];
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            Impl::asMatrix(*j).mmv(xj,Impl::asVector(acc));
+          }
+          y[i.index()] = acc;
+        } else {
+
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            auto&& yi = Impl::asVector(y[i.index()]);
+            Impl::asMatrix(*j).mmv(xj,yi);
+          }
         }
       }
     }
@@ -1729,11 +1766,23 @@ namespace Dune {
       for (ConstRowIterator i=this->begin(); i!=endi; ++i)
       {
         ConstColIterator endj = (*i).end();
-        for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
-        {
-          auto&& xj = Impl::asVector(x[j.index()]);
-          auto&& yi = Impl::asVector(y[i.index()]);
-          Impl::asMatrix(*j).usmv(alpha,xj,yi);
+        // Local row sum: without it the compiler stores y[i] after every block.
+        if constexpr (std::is_trivially_copyable_v<std::decay_t<decltype(y[i.index()])>>) {
+          auto acc = y[i.index()];
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            Impl::asMatrix(*j).usmv(alpha,xj,Impl::asVector(acc));
+          }
+          y[i.index()] = acc;
+        } else {
+
+          for (ConstColIterator j=(*i).begin(); j!=endj; ++j)
+          {
+            auto&& xj = Impl::asVector(x[j.index()]);
+            auto&& yi = Impl::asVector(y[i.index()]);
+            Impl::asMatrix(*j).usmv(alpha,xj,yi);
+          }
         }
       }
     }
